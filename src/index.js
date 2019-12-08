@@ -2,7 +2,10 @@ let signalRHubConnectionFunc;
 
 const makeSureDocument = () => {
   const originalDocument = window.document;
-  window.document = window.document || { readyState: "complete" };
+  if(!window.document)
+    window.document = window.document || { readyState: "complete" };
+  else 
+    return () => {};
   if (!window.document.readyState) {
     window.document.readyState = "complete";
   }
@@ -12,7 +15,9 @@ const makeSureDocument = () => {
 if (!window.addEventListener) {
   window.addEventListener = window.addEventListener = () => {};
 }
-window.navigator.userAgent = window.navigator.userAgent || "react-native";
+if(!window.navigator.userAgent){
+  window.navigator.userAgent = window.navigator.userAgent || "react-native";
+}
 window.jQuery = require("./signalr-jquery-polyfill.js").default;
 
 export default {
@@ -42,16 +47,18 @@ export default {
 
     hubConnectionFunc.start = (options, ...args) => {
       const revertDocument = makeSureDocument();
-      window.document.createElement = () => {
-        return {
+      if(!window.document.createElement)
+        window.document.createElement = () => {
+          return {
+            protocol,
+            host,
+          };
+        };
+      if(!window.location)
+        window.location = {
           protocol,
           host,
         };
-      };
-      window.location = {
-        protocol,
-        host,
-      };
       const returnValue = originalStart.call(hubConnectionFunc, options, ...args);
       revertDocument();
       return returnValue;

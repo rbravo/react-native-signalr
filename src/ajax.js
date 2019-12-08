@@ -40,7 +40,7 @@ export default (headers, options) => {
       request.setRequestHeader(key, value);
     });
   }
-
+  //request.withCredentials = false;
   request.send(
     options.type === 'POST' ? options.data && qs(options.data) : undefined,
   );
